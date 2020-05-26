@@ -1,4 +1,6 @@
 venv/
+.vim/
 **/.*.swp
 **/.*.swo
-**/__pycache__
+**/__pycache__/
+**/*.pyc
