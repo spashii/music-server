@@ -1,0 +1,4 @@
+venv/
+**/.*.swp
+**/.*.swo
+**/__pycache__
