@@ -1,5 +1,6 @@
 {% extends 'base.html' %}
 {% block content %}
+<hr class="invisible">
 <div class="d-flex justify-content-center">
     {% if form %}
 <form method="POST" action="">
@@ -9,7 +10,7 @@
                 {% if form.search_key.errors %}
                 {{ form.search_key(class="form-control form-control-lg is-invalid") }}
                 <div class="invalid-feedback">
-                    {% for error in form.title.errors %}
+                    {% for error in form.search_key.errors %}
                     <span>{{ error }}</span>
                     {% endfor %}
                 </div>
@@ -24,7 +25,10 @@
  </form>
     {% endif %}
 </div>
+<hr class="invisible">
 {% if tracks %}
+<h1>search results</h1>
+<hr class="invisible">
 <table class="table">
     <thead>
         <tr>
@@ -37,7 +41,7 @@
     <tr>
         <td>{{ track.title }}</td>
         {% if not track.is_cached() %}
-        <td><a class="text-info" href="{{ url_for('track_add', id=track.id) }}">add track</a></td> 
+        <td><a class="text-info" href="{{ url_for('track_add', id=track.id) }}">add</a></td> 
         <!--  -->
         <!-- <td><a class="text-danger" href="{{ url_for('track_delete', id=track.id) }}">delete</a></td> -->
         {% endif %}

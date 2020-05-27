@@ -1,6 +1,8 @@
 {% extends 'base.html' %}
 {% block content %}
-<table class="table">
+<hr class="invisible">
+<h1>indexed tracks</h1>
+<table class="table table-sm">
     <thead>
         <tr>
             <th scope="col">title</th>  
@@ -19,5 +21,7 @@
     </tr> 
     {% endfor %}
     </tbody>
+<hr class="invisible">
 </table>
+
 {% endblock content %}

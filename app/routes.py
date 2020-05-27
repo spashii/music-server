@@ -25,7 +25,7 @@ def track_cache(id):
         track = Track.query.get(id)
         if track is not None:
             track.cache()
-    return redirect(request.referrer or url_for('home'))
+    return redirect(request.referrer or url_for('index'))
 
 @app.route('/track/add/<id>')
 def track_add(id):
@@ -33,11 +33,15 @@ def track_add(id):
         Track.index_all()
     else:
         track = Track(id=id).index()  
-    return redirect(request.referrer or url_for('home'))
+    return redirect(request.referrer or url_for('index'))
 
 @app.route('/track/delete/<id>')
 def track_delete(id):
     track = Track.query.get(id)
     if track is not None:
         track.delete_index()
-    return redirect(request.referrer or url_for('home'))
+    return redirect(request.referrer or url_for('index'))
+
+@app.route('/settings')
+def settings():
+    return render_template('settings.html')
