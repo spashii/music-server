@@ -15,7 +15,7 @@
                     {% endfor %}
                 </div>
                 {% else %}
-                {{ form.search_key(class="form-control form-control-lg") }}
+                    {{ form.search_key(class="form-control form-control-lg") }}
                 {% endif %}
             </div>
         </fieldset>
@@ -40,11 +40,15 @@
     {% for track in tracks %}
     <tr>
         <td>{{ track.title }}</td>
-        {% if not track.is_cached() %}
-        <td><a class="text-info" href="{{ url_for('track_add', id=track.id) }}">add</a></td> 
-        <!--  -->
-        <!-- <td><a class="text-danger" href="{{ url_for('track_delete', id=track.id) }}">delete</a></td> -->
-        {% endif %}
+        <td>
+        {% if not track.is_indexed() %}
+            <a class="text-info" href="{{ url_for('track_add', id=track.id) }}">add</a>
+        {% elif track.is_indexed() and not track.is_cached() %}
+            <a class="text-info" href="{{ url_for('track_cache', id=track.id) }}">cache</a>
+        {% else %}
+            <a href="{{ url_for('track_play', id=track.id) }}">play</a>
+        {% endif %} 
+        </td>
     </tr> 
     {% endfor %}
     </tbody>

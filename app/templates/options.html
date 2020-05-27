@@ -1,0 +1,12 @@
+{% extends 'base.html' %}
+{% block content %}
+<hr class="invisible">
+<h1>options</h1>
+<hr class="invisible">
+<div class="row">
+    <div class="list-group list-group-flush">
+        <a class="list-group-item list-group-item-action" href="{{ url_for('track_cache', id='all') }}">cache all</a>
+        <a class="list-group-item list-group-item-action" href="{{ url_for('track_add', id='all') }}">rebuild index</a>
+    </div>
+</div>
+{% endblock content %}

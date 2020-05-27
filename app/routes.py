@@ -1,3 +1,4 @@
+import threading
 from app import app, db
 from app.models import Track
 from app.forms import SearchForm
@@ -42,6 +43,12 @@ def track_delete(id):
         track.delete_index()
     return redirect(request.referrer or url_for('index'))
 
-@app.route('/settings')
-def settings():
-    return render_template('settings.html')
+@app.route('/track/play/<id>')
+def track_play(id):
+    track = Track.query.get(id)
+    return render_template('track_play.html', track=track)
+
+@app.route('/options')
+def options():
+    return render_template('options.html')
+

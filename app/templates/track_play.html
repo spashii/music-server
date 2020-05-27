@@ -1,0 +1,13 @@
+{% extends 'base.html' %}
+{% block content %}
+
+{% if track %}
+<hr class="invisible">
+<h1>playing {{ track.title }}</h1>
+<hr class="invisible">
+    <audio autoplay controls>
+        <source src="{{ url_for('static', filename='track_cache/'+track.id+'.mp3') }}">
+    </audio>
+{% endif %}
+
+{% endblock content%}

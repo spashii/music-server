@@ -1,4 +1,6 @@
 import os
+import time
+import threading
 from app import db
 from app.config import Config
 import youtube_dl
@@ -6,7 +8,7 @@ import urllib
 import requests
 from bs4 import BeautifulSoup
 
-cache_path = Config.TRACK_CACHE_PATH
+track_cache_path = os.path.join(Config.BASE_DIR, 'static', 'track_cache')
 
 ydl_opts = {
     'verbose':  False,
@@ -18,7 +20,7 @@ ydl_opts = {
             'preferredquality': '192',    
         },
         ],
-    'outtmpl': os.path.join(cache_path, '%(id)s.%(ext)s'),
+    'outtmpl': os.path.join(track_cache_path, '%(id)s.%(ext)s'),
     'restrictfilenames': True,
     'nooverwrites': True,
 }
@@ -30,8 +32,14 @@ class Track(db.Model):
     def __repr__(self):
         return self.id
 
+    def is_indexed(self):
+        track = Track.query.get(self.id)
+        if track is None:
+            return False
+        return True
+
     def is_cached(self):
-        path = os.path.join(cache_path, self.id+'.mp3')
+        path = os.path.join(track_cache_path, self.id+'.mp3')
         return os.path.exists(path)
 
     def index(self):
@@ -65,20 +73,17 @@ class Track(db.Model):
 
     @staticmethod
     def index_all():
-        path = os.path.join(cache_path)
+        path = os.path.join(track_cache_path)
         for track_filename in os.listdir(path):
             if track_filename.endswith('.mp3'):
                 id = track_filename.split(sep='.')[0]
-                with youtube_dl.YoutubeDL(ydl_opts) as ydl:
-                    info = ydl.extract_info(id, download=False)
-                title = info.get('title')
                 track = Track.query.get(id)
                 if track is None:
+                    with youtube_dl.YoutubeDL() as ydl:
+                        info = ydl.extract_info(id, download=False)
+                        title = info.get('title')
                     track = Track(id=id, title=title)
                     db.session.add(track)
-                    db.session.commit()
-                else:
-                    track.title = title
                     db.session.commit()
 
     @staticmethod
@@ -86,7 +91,6 @@ class Track(db.Model):
         tracks = Track.query.all()
         for track in tracks:
             track.cache()
-
 
     @staticmethod
     def get_search_result(search_key):
