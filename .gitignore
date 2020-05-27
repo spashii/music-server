@@ -4,3 +4,5 @@ venv/
 **/.*.swo
 **/__pycache__/
 **/*.pyc
+**/*.db
+**/track_cache/
