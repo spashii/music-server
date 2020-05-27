@@ -99,7 +99,7 @@ class Track(db.Model):
         results = soup.select('.yt-uix-tile-link', limit=5)
         for result in results:
             if result['href'].startswith('/watch?v='):
-                track = Track(id = link[-11:],
+                track = Track(id = result['href'][-11:],
                               title = result['title'])
                 tracks.append(track)
         return tracks
