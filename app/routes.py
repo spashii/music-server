@@ -1,18 +1,38 @@
 from app import app, db
 from app.models import Track
+from flask import render_template, redirect, url_for
 
 @app.route('/')
 @app.route('/home')
 def index():
-    return 'hello' 
+    return render_template('home.html') 
 
 @app.route('/library')
 def library():
-    # Track(id='CiTqVvcMB6o').cache_track()
-    # Track.rebuild_index()
-    Track.cache_all()
     tracks = Track.query.order_by(Track.title.asc())
-    count = 0
-    for track in tracks:
-        count += 1
-    return f'{count}'
+    return render_template('library.html', tracks=tracks)
+
+@app.route('/track/cache/<id>')
+def track_cache(id):
+    if id == 'all':
+        Track.cache_all()
+    else:
+        track = Track.query.get(id)
+        if track is not None:
+            track.cache()
+    return redirect(url_for('library'))
+
+@app.route('/track/add/<id>')
+def track_add(id):
+    if id == 'all':
+        Track.index_all()
+    else:
+        track = Track(id=id).index()  
+    return redirect(url_for('library'))
+
+@app.route('/track/delete/<id>')
+def track_delete(id):
+    track = Track.query.get(id)
+    if track is not None:
+        track.delete_index()
+    return redirect(url_for('library'))

@@ -1,0 +1,23 @@
+{% extends 'base.html' %}
+{% block content %}
+<table class="table">
+    <thead>
+        <tr>
+            <th scope="col">title</th>  
+            <th scope="col">action</th>
+        </tr>
+    </thead>
+    <tbody>
+    {% for track in tracks %}
+    <tr>
+        <td>{{ track.title }}</td>
+        {% if not track.is_cached() %}
+        <td><a class="text-info" href="{{ url_for('track_cache', id=track.id) }}">download</a></td> 
+        {% else %}
+        <td><a class="text-danger" href="{{ url_for('track_delete', id=track.id) }}">delete</a></td>
+        {% endif %}
+    </tr> 
+    {% endfor %}
+    </tbody>
+</table>
+{% endblock content %}

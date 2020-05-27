@@ -34,12 +34,28 @@ class Track(db.Model):
         path = os.path.join(cache_path, self.id+'.mp3')
         return os.path.exists(path)
 
-    def cache_track(self):
+    def index(self):
+        track = Track.query.get(self.id)
+        if track is None:
+            with youtube_dl.YoutubeDL(ydl_opts) as ydl:
+                info = ydl.extract_info(self.id, download=False)
+                self.title = info.get('title')
+                db.session.add(self)
+                db.session.commit()
+
+    def delete_index(self):
+        track = Track.query.get(self.id)
+        if track is not None:
+            db.session.delete(track)
+            db.session.commit()
+        
+
+    def cache(self):
         if not self.is_cached():
             with youtube_dl.YoutubeDL(ydl_opts) as ydl:
                 info = ydl.extract_info(self.id, download=True)
                 self.title = info.get('title')
-                track = db.session.query(Track).get(self.id)
+                track = Track.query.get(self.id)
                 if track is None:
                     db.session.add(self)
                     db.session.commit()
@@ -48,10 +64,28 @@ class Track(db.Model):
                     db.session.commit()
 
     @staticmethod
+    def index_all():
+        path = os.path.join(cache_path)
+        for track_filename in os.listdir(path):
+            if track_filename.endswith('.mp3'):
+                id = track_filename.split(sep='.')[0]
+                with youtube_dl.YoutubeDL(ydl_opts) as ydl:
+                    info = ydl.extract_info(id, download=False)
+                title = info.get('title')
+                track = Track.query.get(id)
+                if track is None:
+                    track = Track(id=id, title=title)
+                    db.session.add(track)
+                    db.session.commit()
+                else:
+                    track.title = title
+                    db.session.commit()
+
+    @staticmethod
     def cache_all():
-        tracks = db.session.query(Track).all()
+        tracks = Track.query.all()
         for track in tracks:
-            track.cache_track()
+            track.cache()
 
 
     @staticmethod
@@ -69,22 +103,4 @@ class Track(db.Model):
                               title = result['title'])
                 tracks.append(track)
         return tracks
-
-    @staticmethod
-    def rebuild_index():
-        path = os.path.join(cache_path)
-        for track_filename in os.listdir(path):
-            if track_filename.endswith('.mp3'):
-                id = track_filename.split(sep='.')[0]
-                with youtube_dl.YoutubeDL(ydl_opts) as ydl:
-                    info = ydl.extract_info(id, download=False)
-                title = info.get('title')
-                track = db.session.query(Track).get(id)
-                if track is None:
-                    track = Track(id=id, title=title)
-                    db.session.add(track)
-                    db.session.commit()
-                else:
-                    track.title = title
-                    db.session.commit()
 
