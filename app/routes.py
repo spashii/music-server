@@ -9,6 +9,8 @@ def index():
 @app.route('/library')
 def library():
     # Track(id='CiTqVvcMB6o').cache_track()
+    # Track.rebuild_index()
+    Track.cache_all()
     tracks = Track.query.order_by(Track.title.asc())
     count = 0
     for track in tracks:

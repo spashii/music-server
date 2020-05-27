@@ -31,7 +31,7 @@ class Track(db.Model):
         return self.id
 
     def is_cached(self):
-        path = os.path.join(cache_path, self.id+'.'+ydl_opts.get('postprocessors')[0].get('preferredcodec'))
+        path = os.path.join(cache_path, self.id+'.mp3')
         return os.path.exists(path)
 
     def cache_track(self):
@@ -48,6 +48,13 @@ class Track(db.Model):
                     db.session.commit()
 
     @staticmethod
+    def cache_all():
+        tracks = db.session.query(Track).all()
+        for track in tracks:
+            track.cache_track()
+
+
+    @staticmethod
     def get_search_result(search_key):
         encoded_key = urllib.parse.quote(search_key)
         base = 'https://youtube.com'
@@ -62,3 +69,22 @@ class Track(db.Model):
                               title = result['title'])
                 tracks.append(track)
         return tracks
+
+    @staticmethod
+    def rebuild_index():
+        path = os.path.join(cache_path)
+        for track_filename in os.listdir(path):
+            if track_filename.endswith('.mp3'):
+                id = track_filename.split(sep='.')[0]
+                with youtube_dl.YoutubeDL(ydl_opts) as ydl:
+                    info = ydl.extract_info(id, download=False)
+                title = info.get('title')
+                track = db.session.query(Track).get(id)
+                if track is None:
+                    track = Track(id=id, title=title)
+                    db.session.add(track)
+                    db.session.commit()
+                else:
+                    track.title = title
+                    db.session.commit()
+
