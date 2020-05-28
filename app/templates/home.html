@@ -1,35 +1,36 @@
 {% extends 'base.html' %}
 {% block content %}
 <hr class="invisible">
-<div class="d-flex justify-content-center">
+
     {% if form %}
+    <div class="row d-flex justify-content-center">
+        <div class="col-md-6">
 <form method="POST" action="">
         {{ form.hidden_tag() }}
-        <fieldset class="form-group">
             <div class="form-group">
                 {% if form.search_key.errors %}
-                {{ form.search_key(class="form-control form-control-lg is-invalid") }}
+                {{ form.search_key(class="form-control") }}
                 <div class="invalid-feedback">
                     {% for error in form.search_key.errors %}
                     <span>{{ error }}</span>
                     {% endfor %}
                 </div>
                 {% else %}
-                    {{ form.search_key(class="form-control form-control-lg") }}
+                    {{ form.search_key(class="form-control") }}
                 {% endif %}
             </div>
-        </fieldset>
         <div class="form-group">
-            {{ form.submit(class="btn btn-outline-info") }}
-     </div>
+            {{ form.submit(class="btn btn-secondary") }}
+         </div>
  </form>
     {% endif %}
-</div>
+    </div>
+    </div>
 <hr class="invisible">
 {% if tracks %}
 <h1>search results</h1>
 <hr class="invisible">
-<table class="table">
+<table class="table table-striped">
     <thead>
         <tr>
             <th scope="col">title</th>  
