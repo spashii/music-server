@@ -2,9 +2,10 @@
 {% block content %}
 <hr class="invisible">
 <h1>options</h1>
-<hr class="invisible">
-    <div class="list-group py-0">
-        <a class="list-group-item list-group-item-action" href="{{ url_for('track_cache', id='all') }}">cache all</a>
-        <a class="list-group-item list-group-item-action" href="{{ url_for('track_add', id='all') }}">rebuild index</a>
+<div class="row">
+    <div class="col">
+        <a class="btn btn-secondary btn-sm" href="{{ url_for('track_cache', id='all') }}">cache all</a>
+        <a class="btn btn-secondary btn-sm" href="{{ url_for('track_add', id='all') }}">rebuild index</a>
     </div>
+</div>
 {% endblock content %}

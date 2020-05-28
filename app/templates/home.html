@@ -20,7 +20,7 @@
                 {% endif %}
             </div>
         <div class="form-group">
-            {{ form.submit(class="btn btn-secondary") }}
+            {{ form.submit(class="btn btn-secondary btn-sm") }}
          </div>
  </form>
     {% endif %}
@@ -43,11 +43,11 @@
         <td>{{ track.title }}</td>
         <td>
         {% if not track.is_indexed() %}
-            <a class="text-info" href="{{ url_for('track_add', id=track.id) }}">add</a>
+            <a class="btn btn-primary btn-sm" href="{{ url_for('track_add', id=track.id) }}">add</a>
         {% elif track.is_indexed() and not track.is_cached() %}
-            <a class="text-info" href="{{ url_for('track_cache', id=track.id) }}">cache</a>
+            <a class="btn btn-secondary btn-sm" href="{{ url_for('track_cache', id=track.id) }}">cache</a>
         {% else %}
-            <a href="{{ url_for('track_play', id=track.id) }}">play</a>
+            <a class="btn btn-info btn-sm" href="{{ url_for('track_play', id=track.id) }}">play</a>
         {% endif %} 
         </td>
     </tr> 

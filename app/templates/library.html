@@ -1,7 +1,20 @@
 {% extends 'base.html' %}
 {% block content %}
 <hr class="invisible">
-<h1>indexed tracks</h1>
+<h1>library</h1>
+<div class="row">
+    <div class="col">
+        <a class="btn btn-secondary btn-sm" href="{{ url_for('library', sort_by='date_added') }}">sort by new</a>
+        <a class="btn btn-secondary btn-sm" href="{{ url_for('library', sort_by='title') }}">sort by title</a>
+    </div>
+</div>
+{% if not are_cached %}
+<div class="row mt-1">
+    <div class="col">
+        <a class="btn btn-warning btn-sm" href="{{ url_for('track_cache', id='all') }}">cache all</a>
+    </div>
+</div>
+{% endif %}
 <table class="table table-striped table-sm">
     <thead>
         <tr>
@@ -15,9 +28,19 @@
         <td>{{ track.title }}</td>
         <td>
         {% if track.is_cached() %}
-            <a href="{{ url_for('track_play', id=track.id) }}">play</a>
+            <a class="btn btn-primary btn-sm" href="{{ url_for('track_play', id=track.id) }}">play</a>
+            
+            <div class="btn-group">
+  <button type="button" class="btn btn-info btn-sm dropdown-toggle" data-toggle="dropdown" aria-haspopup="true" aria-expanded="false">add to</button>
+  <div class="dropdown-menu">
+      {% for playlist in playlists %}
+      <a class="dropdown-item dropdown-item-sm" href="{{ url_for('playlist_add', id=playlist.id, track_id=track.id) }}">{{ playlist.title }}</a>
+        {% endfor %}
+  </div>
+</div>
+
         {% else %}
-            <a class="text-warning" href="{{ url_for('track_cache', id=track.id) }}">download</a> 
+            <a class="btn btn-warning btn-sm" href="{{ url_for('track_cache', id=track.id) }}">cache</a> 
         {% endif %}
         </td>
     </tr> 

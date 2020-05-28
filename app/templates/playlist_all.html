@@ -1,0 +1,37 @@
+{% extends 'base.html' %}
+
+{% block content %}
+
+<hr class="invisible">
+<h1>playlists</h1>
+<div class="row">
+    <div class="col">
+        <a class="btn btn-primary btn-sm" href="{{ url_for('playlist_new') }}">new playlist</a>
+    </div>
+</div>
+
+<!-- <div class='d-flex justify-content-start'> -->
+<!--     <div class="col-md-6"> -->
+<table class="table table-striped table-sm">
+    <thead>
+        <tr>
+            <th scope="col">title</th>  
+            <th scope="col">action</th>
+        </tr>
+    </thead>
+    <tbody>
+    {% for playlist in playlists %}
+    <tr>
+        <td>{{ playlist.title }}</td>
+        <td>
+            <a class="btn btn-secondary btn-sm" href="{{ url_for('playlist', id=playlist.id) }}">view</a> 
+            <a class="btn btn-danger btn-sm" href="{{ url_for('playlist_delete', id=playlist.id) }}">delete</a> 
+        </td>
+    </tr> 
+    {% endfor %}
+    </tbody>
+<hr class="invisible">
+</table>
+    <!-- </div></div> -->
+
+{% endblock %}

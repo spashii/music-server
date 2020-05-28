@@ -1,7 +1,7 @@
 import threading
 from app import app, db
-from app.models import Track
-from app.forms import SearchForm
+from app.models import Track, Playlist
+from app.forms import SearchForm, NewPlaylistForm
 from flask import render_template, redirect, url_for, request
 
 @app.route('/', methods=['GET', 'POST'])
@@ -15,8 +15,15 @@ def index():
 
 @app.route('/library')
 def library():
-    tracks = Track.query.order_by(Track.title.asc())
-    return render_template('library.html', tracks=tracks)
+    sort_by = request.args.get('sort_by', default='date_added', type=str)
+    if sort_by == 'title':
+        tracks = Track.query.order_by(Track.title.asc())
+    else:
+        tracks = Track.query.order_by(Track.date_added.desc())
+    playlists = Playlist.query.order_by(Playlist.title.asc())
+    return render_template('library.html', tracks=tracks, are_cached=Track.are_cached(), playlists=playlists)
+
+# convert next three to POST ?
 
 @app.route('/track/cache/<id>')
 def track_cache(id):
@@ -45,10 +52,48 @@ def track_delete(id):
 
 @app.route('/track/play/<id>')
 def track_play(id):
-    track = Track.query.get(id)
+    track = Track.query.get_or_404(id)
     return render_template('track_play.html', track=track)
 
 @app.route('/options')
 def options():
     return render_template('options.html')
 
+@app.route('/playlist')
+def playlist_all():
+    playlists = Playlist.query.all()
+    return render_template('playlist_all.html', playlists=playlists) 
+
+@app.route('/playlist/new', methods=['GET', 'POST'])
+def playlist_new():
+    form = NewPlaylistForm()
+    if form.validate_on_submit():
+         playlist = Playlist(title=form.title.data)
+         db.session.add(playlist)
+         db.session.commit()
+         return redirect(url_for('playlist', id=playlist.id))
+    return render_template('playlist_new.html', form=form)
+
+@app.route('/playlist/delete/<int:id>')
+def playlist_delete(id):
+     playlist = Playlist.query.get_or_404(id)
+     db.session.delete(playlist)
+     db.session.commit()
+     return redirect(request.referrer or url_for('playlist_all'))
+
+@app.route('/playlist/<int:id>')
+def playlist(id):
+    playlist = Playlist.query.get_or_404(id)
+    return render_template('playlist.html', playlist=playlist) 
+
+@app.route('/playlist/<int:id>/add/<track_id>')
+def playlist_add(id, track_id):
+    track = Track.query.get(track_id)
+    playlist = Playlist.query.get(id)
+    if track and playlist:
+        track.add_to_playlist(playlist)
+        db.session.commit()
+    return redirect(request.referrer or\
+                    url_for('playlist', id=id) or\
+                    url_for('playlists'))
+                

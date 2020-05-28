@@ -1,6 +1,5 @@
 import os
-import time
-import threading
+from datetime import datetime
 from app import db
 from app.config import Config
 import youtube_dl
@@ -28,6 +27,11 @@ ydl_opts = {
 class Track(db.Model):
     id = db.Column(db.String(16), primary_key=True)
     title = db.Column(db.String(128))
+    date_added = db.Column(db.DateTime, nullable=False, default=datetime.utcnow)
+    # playlists = db.relationship(
+    #             'Playlist',
+    #             secondary=playlist_tracks,
+    #             )
     
     def __repr__(self):
         return self.id
@@ -72,6 +76,13 @@ class Track(db.Model):
                     db.session.commit()
 
     @staticmethod
+    def are_cached():
+        for track in Track.query.all():
+            if not track.is_cached():
+                return False
+        return True
+
+    @staticmethod
     def index_all():
         path = os.path.join(track_cache_path)
         for track_filename in os.listdir(path):
@@ -80,11 +91,15 @@ class Track(db.Model):
                 track = Track.query.get(id)
                 if track is None:
                     with youtube_dl.YoutubeDL() as ydl:
-                        info = ydl.extract_info(id, download=False)
-                        title = info.get('title')
-                    track = Track(id=id, title=title)
-                    db.session.add(track)
-                    db.session.commit()
+                        try:
+                            info = ydl.extract_info(id, download=False)
+                        except:
+                            title = id
+                        else:
+                            title = info.get('title')
+                        track = Track(id=id, title=title)
+                        db.session.add(track)
+                        db.session.commit()
 
     @staticmethod
     def cache_all():
@@ -108,3 +123,29 @@ class Track(db.Model):
                 tracks.append(track)
         return tracks
 
+    def add_to_playlist(self, playlist):
+        playlist.tracks.append(self)
+        print(f'[music server] {self.id} added to {playlist.title}')
+
+    def remove_from_playlist(self, playlist):
+        playlist.tracks.remove(self)
+        print(f'[music server] {self.id} removed from {playlist.title}')
+
+playlist_tracks = db.Table(
+                   'playlist_tracks',
+                   db.Column('playlist_id', db.Integer, db.ForeignKey('playlist.id')),
+                   db.Column('track_id', db.String(16), db.ForeignKey('track.id')))
+
+class Playlist(db.Model):
+    id = db.Column(db.Integer, primary_key=True) 
+    title = db.Column(db.String(32), unique=True)
+    tracks = db.relationship(
+            'Track',
+            secondary=playlist_tracks,
+            lazy='dynamic',
+            backref=db.backref('playlists', lazy=True))
+
+    def __repr__(self):
+        return f"[title: {self.title}, tracks: {','.join([str(i) for i in self.tracks])}]"
+        
+    
