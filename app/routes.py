@@ -23,9 +23,7 @@ def library():
     playlists = Playlist.query.order_by(Playlist.title.asc())
     return render_template('library.html', tracks=tracks, are_cached=Track.are_cached(), playlists=playlists)
 
-# convert next three to POST ?
-
-@app.route('/track/cache/<id>')
+@app.route('/track/cache/<id>', methods=['POST'])
 def track_cache(id):
     if id == 'all':
         Track.cache_all()
@@ -35,7 +33,7 @@ def track_cache(id):
             track.cache()
     return redirect(request.referrer or url_for('index'))
 
-@app.route('/track/add/<id>')
+@app.route('/track/add/<id>', methods=['POST'])
 def track_add(id):
     if id == 'all':
         Track.index_all()
@@ -43,7 +41,7 @@ def track_add(id):
         track = Track(id=id).index()  
     return redirect(request.referrer or url_for('index'))
 
-@app.route('/track/delete/<id>')
+@app.route('/track/delete/<id>', methods=['POST'])
 def track_delete(id):
     track = Track.query.get(id)
     if track is not None:
@@ -71,10 +69,10 @@ def playlist_new():
          playlist = Playlist(title=form.title.data)
          db.session.add(playlist)
          db.session.commit()
-         return redirect(url_for('playlist', id=playlist.id))
+         return redirect(url_for('playlist_all'))
     return render_template('playlist_new.html', form=form)
 
-@app.route('/playlist/delete/<int:id>')
+@app.route('/playlist/delete/<int:id>', methods=['POST'])
 def playlist_delete(id):
      playlist = Playlist.query.get_or_404(id)
      db.session.delete(playlist)
@@ -86,7 +84,7 @@ def playlist(id):
     playlist = Playlist.query.get_or_404(id)
     return render_template('playlist.html', playlist=playlist) 
 
-@app.route('/playlist/<int:id>/add/<track_id>')
+@app.route('/playlist/<int:id>/add/<track_id>', methods=['POST'])
 def playlist_add(id, track_id):
     track = Track.query.get(track_id)
     playlist = Playlist.query.get(id)
@@ -96,4 +94,16 @@ def playlist_add(id, track_id):
     return redirect(request.referrer or\
                     url_for('playlist', id=id) or\
                     url_for('playlists'))
+
+@app.route('/playlist/<int:id>/remove/<track_id>', methods=['POST'])
+def playlist_remove(id, track_id):
+    track = Track.query.get(track_id)
+    playlist = Playlist.query.get(id)
+    if track and playlist:
+        track.remove_from_playlist(playlist)
+        db.session.commit()
+    return redirect(request.referrer or\
+                    url_for('playlist', id=id) or\
+                    url_for('playlists'))
+                
                 

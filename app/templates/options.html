@@ -4,8 +4,20 @@
 <h1>options</h1>
 <div class="row">
     <div class="col">
-        <a class="btn btn-secondary btn-sm" href="{{ url_for('track_cache', id='all') }}">cache all</a>
-        <a class="btn btn-secondary btn-sm" href="{{ url_for('track_add', id='all') }}">rebuild index</a>
+                    <form action="{{ url_for('track_cache', id='all') }}" method="POST">
+                        <button type="submit" class="btn btn-warning btn-sm">
+                            cache all
+                        </button>
+                    </form> 
+    </div>
+</div>
+<div class="row">
+    <div class="col mt-1">
+                    <form action="{{ url_for('track_add', id='all') }}" method="POST">
+                        <button type="submit" class="btn btn-warning btn-sm">
+                            rebuild index
+                        </button>
+                    </form>
     </div>
 </div>
 {% endblock content %}

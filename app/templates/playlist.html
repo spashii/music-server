@@ -4,11 +4,6 @@
 
 <hr class="invisible">
 <h1>{{ playlist.title }}</h1>
-<div class="row">
-    <div class="col">
-        <a class="btn btn-danger btn-sm" href="{{ url_for('playlist_delete', id=playlist.id) }}">delete playlist</a>
-    </div>
-</div>
 
 <hr class="invisible">
 <h3>tracks</h3>
@@ -26,16 +21,67 @@
     <tr>
         <td>{{ track.title }}</td>
         <td>
-        {% if track.is_cached() %}
-            <a class="btn btn-primary btn-sm" href="{{ url_for('track_play', id=track.id) }}">play</a>
-        {% else %}
-            <a class="btn btn-warning btn-sm" href="{{ url_for('track_cache', id=track.id) }}">cache</a> 
-        {% endif %}
+            <div class="row justify-content-start">
+                <div class="col-auto">
+                {% if track.is_cached() %}
+                        <a class="btn btn-info btn-sm" href={{ url_for('track_play', id=track.id) }} target="_blank">
+                            play
+						</a>
+                {% else %}
+                    <form action="{{ url_for('track_cache', id=track.id) }}" method="POST">
+                        <button type="submit" class="btn btn-warning btn-sm">
+                            cache
+                        </button>
+                    </form> 
+                {% endif %}
+            </div>
+
+                <div class="col-auto">
+                    <button type="submit" class="btn btn-danger btn-sm" data-toggle="modal" data-target="#exampleModal" data-playlist-title="{{ playlist.title }}"data-track-title="{{ track.title }}" data-track-url="{{ url_for('playlist_remove', id=playlist.id, track_id=track.id) }}">
+                        remove
+                </button>
+                </div>
+            </div>
         </td>
-    </tr> 
+    </tr>
     {% endfor %}
     </tbody>
 <hr class="invisible">
 </table>
 
+                <!-- Modal -->
+                <div class="modal fade" id="exampleModal" tabindex="-1" role="dialog" aria-labelledby="exampleModalLabel" aria-hidden="true">
+                  <div class="modal-dialog" role="document">
+                    <div class="modal-content">
+                      <div class="modal-header">
+                        <h5 class="modal-title" id="exampleModalLabel">confirm remove</h5>
+                        <button type="button" class="close" data-dismiss="modal" aria-label="Close">
+                          <span aria-hidden="true">&times;</span>
+                        </button>
+                      </div>
+                      <div class="modal-body">
+                      </div>
+                      <div class="modal-footer">
+                        <button type="button" class="btn btn-secondary btn-sm" data-dismiss="modal">close</button>
+                        <form id="delete-url" action="" method="POST">
+                        <button type="submit" class="btn btn-danger btn-sm">confirm</button>
+                        </form>
+                      </div>
+                    </div>
+                  </div>
+
+{% endblock content %}
+
+{% block scripts %}
+    <script>
+        $('#exampleModal').on('show.bs.modal', function(event) {
+            var button = $(event.relatedTarget);
+            var title = button.data('track-title');
+            var title2 = button.data('playlist-title');
+            var url = button.data('track-url');
+            var modal = $(this);
+            modal.find('.modal-body').text('really want to delete ' + title + ' from ' + title2 + '?');
+            modal.find('#delete-url').attr('action', url);
+        })
+    </script>
 {% endblock %}

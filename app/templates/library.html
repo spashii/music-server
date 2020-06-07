@@ -2,19 +2,33 @@
 {% block content %}
 <hr class="invisible">
 <h1>library</h1>
+
 <div class="row">
     <div class="col">
-        <a class="btn btn-secondary btn-sm" href="{{ url_for('library', sort_by='date_added') }}">sort by new</a>
-        <a class="btn btn-secondary btn-sm" href="{{ url_for('library', sort_by='title') }}">sort by title</a>
+		<div class="btn-group dropright">
+		  <button type="button" class="btn btn-secondary btn-sm dropdown-toggle" data-toggle="dropdown" aria-haspopup="true" aria-expanded="false">
+			sort by
+		  </button>
+		  <div class="dropdown-menu">
+              <a class="btn-sm dropdown-item" href="{{ url_for('library', sort_by='date_added') }}">new</a>
+        <a class="btn-sm dropdown-item" href="{{ url_for('library', sort_by='title') }}">title</a>
+          </div>
+		</div>
     </div>
 </div>
 {% if not are_cached %}
 <div class="row mt-1">
     <div class="col">
-        <a class="btn btn-warning btn-sm" href="{{ url_for('track_cache', id='all') }}">cache all</a>
+        <form action="{{ url_for('track_cache', id='all') }}" method="POST">
+            <button type="submit" class="btn btn-warning btn-sm">
+                cache all
+            </button>
+        </form> 
     </div>
 </div>
 {% endif %}
+
+
 <table class="table table-striped table-sm">
     <thead>
         <tr>
@@ -27,26 +41,86 @@
     <tr>
         <td>{{ track.title }}</td>
         <td>
-        {% if track.is_cached() %}
-            <a class="btn btn-primary btn-sm" href="{{ url_for('track_play', id=track.id) }}">play</a>
-            
-            <div class="btn-group">
-  <button type="button" class="btn btn-info btn-sm dropdown-toggle" data-toggle="dropdown" aria-haspopup="true" aria-expanded="false">add to</button>
-  <div class="dropdown-menu">
-      {% for playlist in playlists %}
-      <a class="dropdown-item dropdown-item-sm" href="{{ url_for('playlist_add', id=playlist.id, track_id=track.id) }}">{{ playlist.title }}</a>
-        {% endfor %}
-  </div>
-</div>
+            <div class="row justify-content-start">
+                <div class="col-auto">
+                {% if track.is_cached() %}
+                        <a class="btn btn-info btn-sm" href={{ url_for('track_play', id=track.id) }} target="_blank">
+                            play
+						</a>
+                {% else %}
+                    <form action="{{ url_for('track_cache', id=track.id) }}" method="POST">
+                        <button type="submit" class="btn btn-warning btn-sm">
+                            cache
+                        </button>
+                    </form> 
+                {% endif %}
+            </div>
 
-        {% else %}
-            <a class="btn btn-warning btn-sm" href="{{ url_for('track_cache', id=track.id) }}">cache</a> 
-        {% endif %}
+                {% if playlists %}
+                <div class="col-auto"
+			 	<div class="btn-group dropright">
+				  <button type="button" class="btn btn-secondary btn-sm dropdown-toggle dropdown-toggle" data-toggle="dropdown" aria-haspopup="true" aria-expanded="false">
+					add to
+				  </button>
+				  <div class="dropdown-menu">
+                      {% for playlist in playlists %}
+						<form action="{{ url_for('playlist_add', id=playlist.id, track_id=track.id) }}" method="POST">
+							<button type="submit" class="btn-sm dropdown-item">
+                                {{ playlist.title }}
+							</button>
+						</form> 
+                      {% endfor %}
+				  </div>
+                </div>
+                {% endif %}
+
+                <div class="col-auto">
+                    <button type="submit" class="btn btn-danger btn-sm" data-toggle="modal" data-target="#exampleModal" data-track-title="{{ track.title }}" data-track-url="{{ url_for('track_delete', id=track.id) }}">
+                    delete
+                </button>
+                </div>
+            </div>
         </td>
-    </tr> 
+    </tr>
     {% endfor %}
     </tbody>
+
 <hr class="invisible">
 </table>
+                
+                <!-- Modal -->
+                <div class="modal fade" id="exampleModal" tabindex="-1" role="dialog" aria-labelledby="exampleModalLabel" aria-hidden="true">
+                  <div class="modal-dialog" role="document">
+                    <div class="modal-content">
+                      <div class="modal-header">
+                        <h5 class="modal-title" id="exampleModalLabel">confirm delete</h5>
+                        <button type="button" class="close" data-dismiss="modal" aria-label="Close">
+                          <span aria-hidden="true">&times;</span>
+                        </button>
+                      </div>
+                      <div class="modal-body">
+                      </div>
+                      <div class="modal-footer">
+                        <button type="button" class="btn btn-secondary btn-sm" data-dismiss="modal">close</button>
+                        <form id="delete-url" action="" method="POST">
+                        <button type="submit" class="btn btn-danger btn-sm">confirm</button>
+                        </form>
+                      </div>
+                    </div>
+                  </div>
 
 {% endblock content %}
+
+
+{% block scripts %}
+    <script>
+        $('#exampleModal').on('show.bs.modal', function(event) {
+            var button = $(event.relatedTarget);
+            var title = button.data('track-title');
+            var url = button.data('track-url');
+            var modal = $(this);
+            modal.find('.modal-body').text('really want to delete ' + title + '?');
+            modal.find('#delete-url').attr('action', url);
+        })
+    </script>
+{% endblock %}
