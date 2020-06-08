@@ -1,36 +1,30 @@
 {% extends 'base.html' %}
 
 {% block extra_head %}
-    <script type="text/javascript" src="{{ url_for('static', filename='js/cplayer.js') }}"></script>
+<link rel="stylesheet" href="{{ url_for('static', filename='styles/APlayer.min.css') }}">
+    <script type="text/javascript" src="{{ url_for('static', filename='js/APlayer.min.js') }}"></script>
 {% endblock extra_head %}
 
 {% block content %}
 <hr class="invisible">
 <h1>now playing</h1>
 <hr class="invisible">
+
 <div id="player">
 </div>
 
 
 <script>
-    let player = new cplayer({
-        element: document.getElementById("player"),
-        big: true,
-        shadowDom: false,
+    const ap = new APlayer({
+        container: document.getElementById('player'),
         autoplay: true,
-        showPlaylist: false,
-        showPlaylistButton: false,
-        playlist:[
-            {
-                src: "{{ url_for('static', filename='track_cache/'+track.id+'.mp3') }}",
-                poster: "",
-                name: "{{ track.title }}",
-                artist: "",
-                lyric: "",
-                sublyric: "",
-                album: "",
-            },
-        ] 
+
+        audio: [{
+            name: "{{ track.title }}",
+            artist: " ",
+            url: "{{ url_for('static', filename='track_cache/'+track.id+'.mp3') }}",
+            cover: "",
+        }]
     })
 </script>
 

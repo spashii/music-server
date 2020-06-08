@@ -4,6 +4,11 @@
 
 <hr class="invisible">
 <h1>{{ playlist.title }}</h1>
+<div class="row">
+    <div class="col">
+        <a class="btn btn-primary btn-sm" href="{{ url_for('playlist_play', id=playlist.id) }}"" target="_blank">play playlist</a>
+    </div>
+</div>
 
 <hr class="invisible">
 <h3>tracks</h3>

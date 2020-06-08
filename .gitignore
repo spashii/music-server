@@ -1,6 +1,7 @@
 venv/
 .vim/
 cplayer/
+aplayer/
 **/.*.swp
 **/.*.swo
 **/__pycache__/
