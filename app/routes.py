@@ -84,6 +84,11 @@ def playlist(id):
     playlist = Playlist.query.get_or_404(id)
     return render_template('playlist.html', playlist=playlist) 
 
+@app.route('/playlist/play/<int:id>')
+def playlist_play(id):
+    playlist = Playlist.query.get_or_404(id)
+    return render_template('playlist_play.html', playlist=playlist)
+
 @app.route('/playlist/<int:id>/add/<track_id>', methods=['POST'])
 def playlist_add(id, track_id):
     track = Track.query.get(track_id)

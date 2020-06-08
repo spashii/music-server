@@ -23,8 +23,11 @@
         <td>{{ playlist.title }}</td>
         <td>
         <div class="row justify-content-start">
+            <div class="col-auto">
+                <a class="btn btn-info btn-sm" href="{{ url_for('playlist_play', id=playlist.id) }}" target="_blank">play</a>
+            </div>
         <div class="col-auto">
-            <a class="btn btn-info btn-sm" href={{ url_for('playlist', id=playlist.id) }}>view</a>
+            <a class="btn btn-secondary btn-sm" href={{ url_for('playlist', id=playlist.id) }}>view</a>
         </div>
         <div class="col-auto">
             <button type="submit" class="btn btn-danger btn-sm" data-toggle="modal" data-target="#exampleModal" data-playlist-title="{{ playlist.title }}" data-playlist-url="{{ url_for('playlist_delete', id=playlist.id) }}">

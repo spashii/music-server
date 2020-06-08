@@ -5,8 +5,9 @@
 {% endblock extra_head %}
 
 {% block content %}
+
 <hr class="invisible">
-<h1>now playing</h1>
+<h1>now playing - {{ playlist.title }}</h1>
 <hr class="invisible">
 <div id="player">
 </div>
@@ -18,9 +19,10 @@
         big: true,
         shadowDom: false,
         autoplay: true,
-        showPlaylist: false,
-        showPlaylistButton: false,
+        showPlaylist: true,
         playlist:[
+            {% for track in playlist.tracks %}
+            {% if track.is_cached() %}
             {
                 src: "{{ url_for('static', filename='track_cache/'+track.id+'.mp3') }}",
                 poster: "",
@@ -30,6 +32,8 @@
                 sublyric: "",
                 album: "",
             },
+            {% endif %}
+            {% endfor %}
         ] 
     })
 </script>
