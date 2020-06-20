@@ -84,6 +84,12 @@ def playlist(id):
     playlist = Playlist.query.get_or_404(id)
     return render_template('playlist.html', playlist=playlist) 
 
+@app.route('/playlist/play_all')
+def playlist_play_all():
+    playlist = Playlist.all()
+    print(playlist)
+    return render_template('playlist_play.html', playlist=playlist)
+
 @app.route('/playlist/play/<int:id>')
 def playlist_play(id):
     playlist = Playlist.query.get_or_404(id)

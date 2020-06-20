@@ -148,4 +148,10 @@ class Playlist(db.Model):
     def __repr__(self):
         return f"[title: {self.title}, tracks: {','.join([str(i) for i in self.tracks])}]"
         
-    
+    @staticmethod
+    def all():
+        playlist = Playlist()
+        playlist.id = -1
+        playlist.title = 'all'
+        playlist.tracks = Track.query.all()
+        return playlist
