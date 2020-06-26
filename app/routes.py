@@ -48,6 +48,11 @@ def track_delete(id):
         track.delete_index()
     return redirect(request.referrer or url_for('index'))
 
+@app.route('/track/decache_all', methods=['POST'])
+def track_decache_all():
+    Track.decache_all()
+    return redirect(request.referrer or url_for('index'))
+
 @app.route('/track/play/<id>')
 def track_play(id):
     track = Track.query.get_or_404(id)
@@ -117,4 +122,5 @@ def playlist_remove(id, track_id):
                     url_for('playlist', id=id) or\
                     url_for('playlists'))
                 
+
                 

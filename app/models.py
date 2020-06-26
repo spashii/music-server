@@ -76,6 +76,13 @@ class Track(db.Model):
                     db.session.commit()
 
     @staticmethod
+    def decache_all():
+        path = track_cache_path
+        for track_file in os.listdir(path):
+            os.remove(os.path.join(path, track_file))
+
+
+    @staticmethod
     def are_cached():
         for track in Track.query.all():
             if not track.is_cached():
