@@ -11,7 +11,7 @@ Flask-WTF==0.14.3
 idna==2.9
 itsdangerous==1.1.0
 Jinja2==2.11.2
-Mako==1.1.2
+Mako==1.2.2
 MarkupSafe==1.1.1
 python-dateutil==2.8.1
 python-dotenv==0.13.0
